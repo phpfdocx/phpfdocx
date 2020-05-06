@@ -1,5 +1,5 @@
 # phpfdocx
-Script php para pesquisar e substituir palavras em documentos docx
+PHP Script for searching and replacing words in docx documents
 
 How to use >> 
 See examples in the Project folder.
