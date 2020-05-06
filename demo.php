@@ -24,12 +24,12 @@
 */
 include 'PhpFDocx.php';
 
-$doc          = 'test2.docx';
-//$doc        = 'test1.docx';
+$doc          = 'test1.docx';
 //$doc        = 'test2.docx';
 //$doc        = 'test3.docx';
 //$doc        = 'test4.docx';
 //$doc        = 'test5.docx';
+//$doc        = 'test6.docx';
 
 $aDataSearch = Array (  'name'                    ,
 						'address'                 ,
