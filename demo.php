@@ -2,7 +2,7 @@
 /*
  * PhpFDocx 1.0.0
  *
- * @link https://github.com/hfornazier/PhpFDocx
+ * @link https://github.com/phpfdocx/phpfdocx
  * @author Humberto Fornazier
  * contact: phpfdocx@gmail.com
  * @since 05.03.2020 
