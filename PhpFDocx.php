@@ -107,7 +107,7 @@ function change02( $content_XML ,$aDataSearch , $aDataChange ) {
 /*
 */
 function change03( $content_XML ,$aDataSearch , $aDataChange ) {
-	$posIni = 0;
+         $posIni = 0;
 	$ct     = 0;
 	$t      = 0;
 	$cBlock = '';
@@ -117,51 +117,52 @@ function change03( $content_XML ,$aDataSearch , $aDataChange ) {
 		$char = substr( $content_XML , $i , 1 ); 
 		
 		if( $char == '{' AND $t == 0 ) {
-			$iniKey = $i;  
+			$chaveIni = $i; 
 			$t = 1;		
 		}	
 
 		if( $char == '}' AND $t == 1 ) {
 			
-			$endKey    = $i;  
-			$cBlock    = substr( $content_XML , $iniKey , ( $endKey - $iniKey ) + 1 );
-			$t         = 0; 
-            $lChange   = false;
+			$chaveEnd  = $i;  
+			$cBlock    = substr( $content_XML , $chaveIni , ( $chaveEnd - $chaveIni ) + 1 );
+			$t         = 0;
+			$lChange   = false;
 			$cBlockTmp = $cBlock;
 			
 			for( $k = 0 ; $k < count( $aDataSearch ) ; $k++ ) {
-
+				
 				if( strpos( $cBlockTmp , '<w:t>{'.$aDataSearch[ $k ] ) !== false ) {
 					$cBlockTmp   = str_replace( '<w:t>{'.$aDataSearch[ $k ] , '<w:t>'.$aDataChange[ $k ]  , $cBlockTmp );				
 					$cBlockTmp   = str_replace( '{' , '' , $cBlockTmp );				
 					$cBlockTmp   = str_replace( '}' , '' , $cBlockTmp );
 					$content_XML = str_replace( $cBlock , $cBlockTmp , $content_XML );
-                    $lChange     = true;					
-				}		
-				
+					$lChange     = true;					
+				}			
 				if( !$lChange AND strpos( $cBlockTmp , $aDataSearch[ $k ] ) !== false ) {
+					$cBlockTmp   = str_replace( '<w:t>'.$aDataSearch[ $k ].'<w:t>}' , '<w:t>'.$aDataChange[ $k ].'</w:t>'  , $cBlockTmp );						
 					$cBlockTmp   = str_replace( '<w:t>'.$aDataSearch[ $k ].'}' , '<w:t>'.$aDataChange[ $k ]  , $cBlockTmp );				
+					$cBlockTmp   = str_replace( '{'.$aDataSearch[ $k ].'</w:t>' , $aDataChange[ $k ].'</w:t>'  , $cBlockTmp ); //ÚLTIMO 21/05 - 11:05
 					$cBlockTmp   = str_replace( '{' , '' , $cBlockTmp );				
 					$cBlockTmp   = str_replace( '}' , '' , $cBlockTmp );
 					$content_XML = str_replace( $cBlock , $cBlockTmp , $content_XML );
-                    $lChange     = true;					
-				}									
+					$lChange     = true;					
+				}		
+				
 			}
 			
-			if( !$lChange )	{ 			     			
+			if( !$lChange )	{
 
 				$aContent2 = getContents( $cBlockTmp .'</w:t>' , '<w:t>' , '</w:t>' ); 												
 				$cNewVar   = '';					
 				$aResto    = getContents( $cBlockTmp , '{' , '</w:t>' ); 
-				
 				for( $q = 0 ; $q < count( $aResto ) ; $q++ ) {					
 					$cNewVar   .= $aResto[ $q ];
-					$cBlockTmp  = str_replace(  '<w:t>'.$aResto[ $q ].'</w:t>' , '<w:t></w:t>' , $cBlockTmp );				    	
+					$cBlockTmp = str_replace(  '<w:t>'.$aResto[ $q ].'</w:t>' , '<w:t></w:t>' , $cBlockTmp );				    	
 				}
 				
 				for( $q = 0 ; $q < count( $aContent2 ) ; $q++ ) {					
 					$cNewVar   .= $aContent2[ $q ];
-					$cBlockTmp  = str_replace(  '<w:t>'.$aContent2[ $q ].'</w:t>' , '<w:t></w:t>' , $cBlockTmp );				    	
+					$cBlockTmp = str_replace(  '<w:t>'.$aContent2[ $q ].'</w:t>' , '<w:t></w:t>' , $cBlockTmp );				    	
 				}
 
 				$cNewVar = str_replace( '{' , '' , $cNewVar );				
@@ -178,22 +179,21 @@ function change03( $content_XML ,$aDataSearch , $aDataChange ) {
 							$cBlockTmp = str_replace( '{'.$aContentTmp[ $q ] , '' , $cBlockTmp );							
 						}
 						
-						$cBlockTmp     = str_replace( '{' , '' , $cBlockTmp );				
-						$cBlockTmp     = str_replace( '}' , '' , $cBlockTmp );				
-						$cBlockTmp     = str_replace( '<w:t></w:t>' , '' , $cBlockTmp );	
-
-                        $aContentTmp   = getContents( $cBlockTmp.'</w:t>' , '<w:t>' , '</w:t>' ); 
+						$cBlockTmp   = str_replace( '{' , '' , $cBlockTmp );				
+						$cBlockTmp   = str_replace( '}' , '' , $cBlockTmp );				
+						$cBlockTmp   = str_replace( '<w:t></w:t>' , '' , $cBlockTmp );
+						
+						$aContentTmp = getContents( $cBlockTmp.'</w:t>' , '<w:t>' , '</w:t>' ); 
 						for( $z = 0 ; $z < count( $aContentTmp ) ; $z++ ) {
-                            $cBlockTmp = str_replace( '<w:t>'.$aContentTmp[ $z ] , '<w:t>' , $cBlockTmp );							
+					             $cBlockTmp   = str_replace( '<w:t>'.$aContentTmp[ $z ] , '<w:t>' , $cBlockTmp );							
 						}
 						
-						$content_XML   = str_replace( $cBlock , $cBlockTmp . '<w:t>'.$cDataChange.'</w:t>'  , $content_XML ); //. '<w:t>'.$aDataChange[ $k ].'</w:t>'																											
-						$lChange       = true;				
-                    }
+						$content_XML = str_replace( $cBlock , $cBlockTmp . '<w:t>'.$cDataChange.'</w:t>'  , $content_XML ); 																										
+						$lChange     = true;				
+                                         }
 					
-				}									
-			}				
-			
+				   }									
+			  }							
 		}
 
 		$ct++;  
@@ -203,7 +203,7 @@ function change03( $content_XML ,$aDataSearch , $aDataChange ) {
 	
     return $content_XML;
 	
-}		
+}	
 
 /*
 */
