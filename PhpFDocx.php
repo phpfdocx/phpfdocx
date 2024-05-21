@@ -1,6 +1,6 @@
-﻿<?php
+<?php
 /*
- * PhpFDocx 1.0.0
+ * PhpFDocx 2.0.0
  *
  * @link https://github.com/phpfdocx/phpfdocx
  * @author Humberto Fornazier
@@ -8,28 +8,14 @@
  * @since 05.03.2020 
 */
 
-/* 
-    ************************* VERY IMPORTANT: ***********************
-	1) Variables to be searched for and replaced must be in lowercase
-	
-    Do not use numbers in the variables to be replaced.
-    Example: ${phone3}, ${name1}, {$email4) ...
-
-	Variables cannot have spaces, symbols or special characters. 	
-	Example:
-	my home = must be myhome
-	my_home = must be myhome
- 	
-
+/* 	
 */
-function PhpFDocx( $doc , $aDataSearch , $aDataChange ) {
-    
-	$newdoc    = generatePrefix().'_'.$doc;
+function PhpFDocx( $doc , $aDataSearch , $aDataChange ) {	
+
+	$newdoc    = removeSymbolsStr( $doc ) . '-' . generatePrefix() . '.docx'; 	
 	$docsPath  = 'doc/'.$doc;
 	$template  = $docsPath;
-	$fileName  = $newdoc;
-	$folterTmp = 'tmp/';
-	$path_Doc = $folterTmp . '/' . $fileName;
+	$path_Doc = 'tmp/' . $newdoc;
 	
 	try {
 		
@@ -49,110 +35,177 @@ function PhpFDocx( $doc , $aDataSearch , $aDataChange ) {
 	
     }
 
-    $aContent = getContents( $content_XML , '${', '}');			
-    $aContentSeg = $aContent;							
-
-    for( $x = 0 ; $x <= count( $aContent ) ; $x++ ) { 
-		
-        for( $k = 0 ; $k <= count( $aDataSearch ) ; $k++ ) { 		
-			
-            if( ( isset( $aContent[ $x ] ) ) and ( isset( $aDataSearch[ $k ] ) ) ) {
-				    
-                if( strpos( $aContent[ $x ] , '<w:t>'.$aDataSearch[ $k ].'</w:t>' ) !== false ) {
-					$tmp =  $aContent[ $x ];
-					$tmp =  str_replace(  $aDataSearch[ $k ] , $aDataChange[ $k ] , $tmp ) ;
-					$content_XML = str_replace( $aContent[ $x ] , $tmp , $content_XML );
-					$aContentSeg[ $x ] = 'T';
-				}
-
-                if( strpos( $content_XML , '${'.$aDataSearch[ $k ].'}' ) !== false ) { 							
-                    $content_XML = str_replace( '${'.$aDataSearch[ $k ].'}' , $aDataChange[ $k ] , $content_XML );
-
-                    for( $n = 0 ; $n <= count( $aContentSeg ) ; $n++ ) {
-					
-                        if( isset( $aContentSeg[ $n ] ) ) {								
-                   
-			                $compareStr = getOnlyLowercase( $aContentSeg[ $n ] );
-		                    if( $compareStr == $aDataSearch[ $k ] )  {						
-			                    $aContentSeg[ $n ] = 'T'; 	
-			                } 
-			            }
-		            }					
-	            }				
-
-		        if( strpos( $content_XML ,  '<w:t>'. $aDataSearch[ $k ].'</w:t>' ) !== false ) { 							
-			
-			        $content_XML = str_replace( '<w:t>'. $aDataSearch[ $k ].'</w:t>' , '<w:t>'. $aDataChange[ $k ].'</w:t>' , $content_XML );					
-
-		            for( $n = 0 ; $n <= count( $aContentSeg ) ; $n++ ) {   				
-				
-                        if( isset( $aContentSeg[ $n ] ) ) {
-					
-                            $compareStr = getOnlyLowercase( $aContentSeg[ $n ] );
-		                    if( $compareStr == $aDataSearch[ $k ] )  {
-			                    $aContentSeg[ $n ] = 'T'; 								 
-			                } 
-			            }
-		            }					
-		        }
-	        }										
-	    }				
-    }			
-		
-    for( $x = 0 ; $x <= count( $aContentSeg ) ; $x++ ) {
-        if( isset( $aContentSeg[ $x ] ) ) {
-            if( $aContentSeg[ $x ] !== 'T' ) {	
-	            $onlyLowerChars = getOnlyLowercase( $aContentSeg[ $x ] );
-	            if( !empty($onlyLowerChars) ) {
-		            $posArray = array_search( $onlyLowerChars , $aDataSearch );
-		            $subst    = '';
-		            if( $posArray > 0 ) {
-		                $subst = $aDataChange[ $posArray ];
-                    }					
-                    $pos = strpos(  $aContentSeg[ $x ] , substr( $onlyLowerChars , 0 , 1 ) ); 				
-		            $content_XML = str_replace( $aContentSeg[ $x ] , $subst , $content_XML );
-	            }
-	        }
-        }			
-    }	
-
-	$newStr = '';
-	for( $r = 0 ; $r <= count( $aContentSeg ) ; $r++ ) {
-	    if( isset( $aContentSeg[ $r ] ) ) {
-			
-			if( $aContentSeg[ $r ] !== 'T' ) {	
-			    
-				$onlyLowerChars = getOnlyLowercase( $aContentSeg[ $r ] );
-	            if( !empty($onlyLowerChars) ) {
-		            $posArray = array_search( $onlyLowerChars , $aDataSearch );		        
-					$subst    = '';
-		            if( $posArray > 0 ) {
-						$subst = $aDataChange[ $posArray ];
-					} 
-				}			
-			
-			    $newStr = oBorgSpecialSearchAndReplace( $aContentSeg[ $r ] , $subst );
-				$content_XML = str_replace( $aContentSeg[ $r ] , $subst , $content_XML );
-				
-			}
-		}
-    }			
+    $content_XML = change01( $content_XML ,$aDataSearch , $aDataChange );
+    $content_XML = change02( $content_XML ,$aDataSearch , $aDataChange );	
+    $content_XML = change03( $content_XML ,$aDataSearch , $aDataChange );		
 	
-    $content_XML = str_replace( '${'            , '' , $content_XML);		
-    $content_XML = str_replace( '<w:t>$</w:t>'  , '' , $content_XML);		
-    $content_XML = str_replace( '<w:t>${</w:t>' , '' , $content_XML);		
-    $content_XML = str_replace( '<w:t>}</w:t>'  , '' , $content_XML);
-    $content_XML = str_replace( '<w:t>{</w:t>'  , '' , $content_XML);	
-    $content_XML = str_replace( '{</w:t>'       , '</w:t>' , $content_XML);	
-    $content_XML = str_replace( '}</w:t>'       , '</w:t>' , $content_XML);	
-
     $zip_val->addFromString($key_XML, $content_XML);
     $zip_val->close();			
 
-    return( $folterTmp . $fileName ); 		
+    return( $path_Doc ); 		
 	
+}	
+
+/*
+*/
+function change01( $content_XML ,$aDataSearch , $aDataChange ) {
+	
+    for ($k = 0; $k < count($aDataSearch); $k++) {
+        $content_XML = str_replace('<w:t>{'.$aDataSearch[$k].'}</w:t>', '<w:t>'.$aDataChange[$k].'</w:t>', $content_XML);
+        $content_XML = str_replace('{'.$aDataSearch[$k].'}', $aDataChange[$k], $content_XML);
+    }
+	
+    return $content_XML;
 }
+
+/*
+*/
+function change02( $content_XML ,$aDataSearch , $aDataChange ) {	
+	$posIni  = 0;
+	$ct      = 0;
+	$t       = 0;
+	$cBlock  = '';
+
+	for( $i = 0 ; $i <= strlen( $content_XML ) ; $i++ ) {
 		
+		$char = substr( $content_XML , $i , 1 ); 
+		
+		if( $char == '{' AND $t == 0 ) {
+			$chaveIni = $i; 
+			$t = 1;		
+		}	
+
+		if( $char == '}' AND $t == 1 ) {
+			
+			$chaveEnd = $i; 
+			$t = 2;
+			$cBlock = substr( $content_XML , $chaveIni , ( $chaveEnd - $chaveIni ) + 1 );
+			$t = 0; 	
+
+			$cBlockTmp = $cBlock;
+			for( $k = 0 ; $k < count( $aDataSearch ) ; $k++ ) {
+				
+				if( strpos( $cBlockTmp , '<w:t>'.$aDataSearch[ $k ].'</w:t>' ) !== false ) {
+					$cBlockTmp   = str_replace( '<w:t>'.$aDataSearch[ $k ].'</w:t>' , '<w:t>'.$aDataChange[ $k ].'</w:t>'  , $cBlockTmp );
+					$cBlockTmp   = str_replace( '{' , '' , $cBlockTmp );				
+					$cBlockTmp   = str_replace( '}' , '' , $cBlockTmp );
+					$content_XML = str_replace( $cBlock , $cBlockTmp , $content_XML );	
+				}			
+				
+			}		
+			
+		}
+
+		$ct++;  
+		$posIni++;	
+		
+	}	
+
+    return $content_XML;
+	
+}	
+
+/*
+*/
+function change03( $content_XML ,$aDataSearch , $aDataChange ) {
+	$posIni = 0;
+	$ct     = 0;
+	$t      = 0;
+	$cBlock = '';
+
+	for( $i = 0 ; $i <= strlen( $content_XML ) ; $i++ ) {
+		
+		$char = substr( $content_XML , $i , 1 ); 
+		
+		if( $char == '{' AND $t == 0 ) {
+			$chaveIni = $i;  
+			$t = 1;		
+		}	
+
+		if( $char == '}' AND $t == 1 ) {
+			
+			$chaveEnd = $i;  
+			$t = 2;
+			$cBlock = substr( $content_XML , $chaveIni , ( $chaveEnd - $chaveIni ) + 1 );
+			$t      = 0; 	
+
+            $lChange = false;
+			$cBlockTmp = $cBlock;
+			for( $k = 0 ; $k < count( $aDataSearch ) ; $k++ ) {
+
+				if( strpos( $cBlockTmp , '<w:t>{'.$aDataSearch[ $k ] ) !== false ) {
+					$cBlockTmp = str_replace( '<w:t>{'.$aDataSearch[ $k ] , '<w:t>'.$aDataChange[ $k ]  , $cBlockTmp );				
+					$cBlockTmp = str_replace( '{' , '' , $cBlockTmp );				
+					$cBlockTmp = str_replace( '}' , '' , $cBlockTmp );
+					$content_XML = str_replace( $cBlock , $cBlockTmp , $content_XML );
+                    $lChange = true;					
+				}			
+				if( !$lChange AND strpos( $cBlockTmp , $aDataSearch[ $k ] ) !== false ) {
+					$cBlockTmp = str_replace( '<w:t>'.$aDataSearch[ $k ].'}' , '<w:t>'.$aDataChange[ $k ]  , $cBlockTmp );				
+					$cBlockTmp = str_replace( '{' , '' , $cBlockTmp );				
+					$cBlockTmp = str_replace( '}' , '' , $cBlockTmp );
+					$content_XML = str_replace( $cBlock , $cBlockTmp , $content_XML );
+                    $lChange = true;					
+				}									
+			}
+			
+			if( !$lChange )	{ 			     			
+
+				$aContent2 = getContents( $cBlockTmp .'</w:t>' , '<w:t>' , '</w:t>' ); 												
+				$cNewVar   = '';					
+				$aResto    = getContents( $cBlockTmp , '{' , '</w:t>' ); 
+				
+				for( $q = 0 ; $q < count( $aResto ) ; $q++ ) {					
+					$cNewVar   .= $aResto[ $q ];
+					$cBlockTmp = str_replace(  '<w:t>'.$aResto[ $q ].'</w:t>' , '<w:t></w:t>' , $cBlockTmp );				    	
+				}
+				
+				for( $q = 0 ; $q < count( $aContent2 ) ; $q++ ) {					
+					$cNewVar   .= $aContent2[ $q ];
+					$cBlockTmp = str_replace(  '<w:t>'.$aContent2[ $q ].'</w:t>' , '<w:t></w:t>' , $cBlockTmp );				    	
+				}
+
+				$cNewVar = str_replace( '{' , '' , $cNewVar );				
+				$cNewVar = str_replace( '}' , '' , $cNewVar );	
+				
+				if( !empty( $cNewVar ) ) {	
+				
+					$pont = array_search($cNewVar,$aDataSearch);
+					if( $pont > 0 ) {
+						$cDataChange = $aDataChange[$pont];							
+						
+						$aContentTmp = getContents( $cBlockTmp , '{' , '</w:t>' ); 														
+						for( $q = 0 ; $q < count( $aContentTmp ) ; $q++ ) {					
+							$cBlockTmp = str_replace( '{'.$aContentTmp[ $q ] , '' , $cBlockTmp );							
+						}
+						
+						$cBlockTmp   = str_replace( '{' , '' , $cBlockTmp );				
+						$cBlockTmp   = str_replace( '}' , '' , $cBlockTmp );				
+						$cBlockTmp   = str_replace( '<w:t></w:t>' , '' , $cBlockTmp );	
+
+                        $aContentTmp = getContents( $cBlockTmp.'</w:t>' , '<w:t>' , '</w:t>' ); 
+						for( $z = 0 ; $z < count( $aContentTmp ) ; $z++ ) {
+                            $cBlockTmp   = str_replace( '<w:t>'.$aContentTmp[ $z ] , '<w:t>' , $cBlockTmp );							
+						}
+						
+						$content_XML = str_replace( $cBlock , $cBlockTmp . '<w:t>'.$cDataChange.'</w:t>'  , $content_XML ); //. '<w:t>'.$aDataChange[ $k ].'</w:t>'																											
+						$lChange     = true;				
+                    }
+					
+				}									
+			}				
+			
+		}
+
+		$ct++;  
+		$posIni++;	
+		
+	}
+	
+    return $content_XML;
+	
+}		
+
 /*
 */
 function getContents($str, $startDelimiter, $endDelimiter) {
@@ -175,80 +228,17 @@ function getContents($str, $startDelimiter, $endDelimiter) {
 
 /*
 */
-function getOnlyLowercase( $str ) {
-    $ret = '';
-
-    $str = str_replace( 'w:cs'           , '' , $str );
-    $str = str_replace( 'w:rFonts'       , '' , $str );
-    $str = str_replace( '<w:t>'          , '' , $str );
-    $str = str_replace( '</w:t>'         , '' , $str );	
-    $str = str_replace( '<w:r>'          , '' , $str );		
-    $str = str_replace( '</w:r>'         , '' , $str );
-    $str = str_replace( '<w:r w:rsidR='  , '' , $str );	
-    $str = str_replace( '<w:rPr>'        , '' , $str );		
-    $str = str_replace( '<w:b/>'         , '' , $str );		
-    $str = str_replace( '<w:bCs/>'       , '' , $str );
-    $str = str_replace( '</w:rPr>'       , '' , $str );
-    $str = str_replace( '<w:r w:rsidRPr' , '' , $str );
-    $str = str_replace( '<w:r w:rsidR'   , '' , $str );
-    $str = str_replace( 'w:rsidRPr'      , '' , $str );	
-		
-    $ct = getContents( $str , '<' , '>' );
-	for( $x = 0 ; $x <= count( $ct ) ; $x++ ) { 
-        if( isset( $ct[ $x ] ) ) { 	
-	        $str = str_replace( $ct[ $x ] , '' , $str );				  
-		}
-	}	  
-    $str = str_replace( '<' , '' , $str );					  
-    $str = str_replace( '>' , '' , $str );				  
-    $str = str_replace( '/' , '' , $str );	    
-	
-	$n_caracteres = strlen( $str );
-	
-	for( $i=0; $i < $n_caracteres ; $i++ ){
-		if( ctype_lower($str[$i]) ) {
-			$ret .= $str[$i];
-		}	
-	}    
-	
-    return $ret;
-}
-
-/*
-*/
-function oBorgSpecialSearchAndReplace( $str , $subst ) {
-	
-    $firstPos = strpos ( $str , '<' );
-	$LastPos  = strrpos( $str , '>' );
-	$Part     = substr( $str , $firstPos , $LastPos-$firstPos );
-	$ct       = getContents( $str , '<' , '>' );
-	
-    for( $x = 0 ; $x <= count( $ct ) ; $x++ ) { 			  
-	    if( isset(  $ct[ $x ] ) ) {
-            $str = str_replace( $ct[ $x ] , '' , $str );				  
-		}
-    }	  
-			  
-    $Part = str_replace( '<w:t>'  , '' , $Part );
-    $Part = str_replace( '</w:t>' , '' , $Part );
-    $Part = str_replace( '<w:t'   , '' , $Part );		  
-    $newStr = $subst.'</w:t>'.$Part;	
-	
-    return $newStr; 
-	
-}
-
-/*
-*/
-function generatePrefix() {    	
-    $chars = 'abcdxyswz0123456789';
-    $max = strlen($chars) - 1;
-    $prefix = null;
-    for($i=0;$i < 4; $i++) {
-        $prefix .= $chars{mt_rand(0,$max)};
-    }
-    return rand(10,99).$prefix;          
+function generatePrefix() {  
+    $numbers     = (((date('Ymd') / 12) * 24) + mt_rand(800, 9999));
+    $numbers    .= 123456789;
+    $characters  = $numbers . 'ABCDEFGHJKMNPQRSTXYZ';
+    $ret         = substr(str_shuffle($characters), 0, 6);     
+    return $ret;       
 }   
-?>	
 
-	
+/*
+*/
+function removeSymbolsStr($str) {
+    return( preg_replace("/[^a-zA-Z0-9]/", "", $str));
+}
+?>
