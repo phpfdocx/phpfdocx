@@ -18,10 +18,10 @@ include 'PhpFDocx.php';
 //$doc  = 'test5.docx';
 //$doc  = 'test6.docx';
 
-$doc = 'test1.docx';
+$doc = 'test7.docx';
 
 $aDataSearch = Array (  
-                        'name'                    ,					
+            'name'                    ,					
 			'NAME'                    ,
 			'address'                 ,
 			'ADDRESS'                 ,
@@ -37,14 +37,14 @@ $aDataSearch = Array (
 			'organizationnumber'      ,				   
 			'email'                   ,				   
 			'today'                   , 				
-                        'documenttitle'           ,
+            'documenttitle'           ,
 			'[test$variable]'         ,				
 			'test_complex!and@long-variable|for#tests'					
 		      );
 
 $aDataChange = Array (  
-                        'Greyce, MacKensie X.'      ,
-                        'GREYCE, MACKENSIE X.'      ,						
+            'Greyce, MacKensie X.'      ,
+            'GREYCE, MACKENSIE X.'      ,						
 			'Ap #288-1785-B5 Morbi Road', 
 			'AP #288-1785-B5 MORBI ROAD',
 			'Saint-Georges'             , 

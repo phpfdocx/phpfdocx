@@ -71,18 +71,17 @@ function change02( $content_XML ,$aDataSearch , $aDataChange ) {
 		$char = substr( $content_XML , $i , 1 ); 
 		
 		if( $char == '{' AND $t == 0 ) {
-			$chaveIni = $i; 
+			$iniKey = $i; 
 			$t = 1;		
 		}	
 
 		if( $char == '}' AND $t == 1 ) {
 			
-			$chaveEnd = $i; 
-			$t = 2;
-			$cBlock = substr( $content_XML , $chaveIni , ( $chaveEnd - $chaveIni ) + 1 );
-			$t = 0; 	
-
+			$endKey    = $i; 
+			$cBlock    = substr( $content_XML , $iniKey , ( $endKey - $iniKey ) + 1 );
+			$t         = 0; 	
 			$cBlockTmp = $cBlock;
+			
 			for( $k = 0 ; $k < count( $aDataSearch ) ; $k++ ) {
 				
 				if( strpos( $cBlockTmp , '<w:t>'.$aDataSearch[ $k ].'</w:t>' ) !== false ) {
@@ -118,34 +117,34 @@ function change03( $content_XML ,$aDataSearch , $aDataChange ) {
 		$char = substr( $content_XML , $i , 1 ); 
 		
 		if( $char == '{' AND $t == 0 ) {
-			$chaveIni = $i;  
+			$iniKey = $i;  
 			$t = 1;		
 		}	
 
 		if( $char == '}' AND $t == 1 ) {
 			
-			$chaveEnd = $i;  
-			$t = 2;
-			$cBlock = substr( $content_XML , $chaveIni , ( $chaveEnd - $chaveIni ) + 1 );
-			$t      = 0; 	
-
-            $lChange = false;
+			$endKey    = $i;  
+			$cBlock    = substr( $content_XML , $iniKey , ( $endKey - $iniKey ) + 1 );
+			$t         = 0; 
+            $lChange   = false;
 			$cBlockTmp = $cBlock;
+			
 			for( $k = 0 ; $k < count( $aDataSearch ) ; $k++ ) {
 
 				if( strpos( $cBlockTmp , '<w:t>{'.$aDataSearch[ $k ] ) !== false ) {
-					$cBlockTmp = str_replace( '<w:t>{'.$aDataSearch[ $k ] , '<w:t>'.$aDataChange[ $k ]  , $cBlockTmp );				
-					$cBlockTmp = str_replace( '{' , '' , $cBlockTmp );				
-					$cBlockTmp = str_replace( '}' , '' , $cBlockTmp );
+					$cBlockTmp   = str_replace( '<w:t>{'.$aDataSearch[ $k ] , '<w:t>'.$aDataChange[ $k ]  , $cBlockTmp );				
+					$cBlockTmp   = str_replace( '{' , '' , $cBlockTmp );				
+					$cBlockTmp   = str_replace( '}' , '' , $cBlockTmp );
 					$content_XML = str_replace( $cBlock , $cBlockTmp , $content_XML );
-                    $lChange = true;					
-				}			
+                    $lChange     = true;					
+				}		
+				
 				if( !$lChange AND strpos( $cBlockTmp , $aDataSearch[ $k ] ) !== false ) {
-					$cBlockTmp = str_replace( '<w:t>'.$aDataSearch[ $k ].'}' , '<w:t>'.$aDataChange[ $k ]  , $cBlockTmp );				
-					$cBlockTmp = str_replace( '{' , '' , $cBlockTmp );				
-					$cBlockTmp = str_replace( '}' , '' , $cBlockTmp );
+					$cBlockTmp   = str_replace( '<w:t>'.$aDataSearch[ $k ].'}' , '<w:t>'.$aDataChange[ $k ]  , $cBlockTmp );				
+					$cBlockTmp   = str_replace( '{' , '' , $cBlockTmp );				
+					$cBlockTmp   = str_replace( '}' , '' , $cBlockTmp );
 					$content_XML = str_replace( $cBlock , $cBlockTmp , $content_XML );
-                    $lChange = true;					
+                    $lChange     = true;					
 				}									
 			}
 			
@@ -157,12 +156,12 @@ function change03( $content_XML ,$aDataSearch , $aDataChange ) {
 				
 				for( $q = 0 ; $q < count( $aResto ) ; $q++ ) {					
 					$cNewVar   .= $aResto[ $q ];
-					$cBlockTmp = str_replace(  '<w:t>'.$aResto[ $q ].'</w:t>' , '<w:t></w:t>' , $cBlockTmp );				    	
+					$cBlockTmp  = str_replace(  '<w:t>'.$aResto[ $q ].'</w:t>' , '<w:t></w:t>' , $cBlockTmp );				    	
 				}
 				
 				for( $q = 0 ; $q < count( $aContent2 ) ; $q++ ) {					
 					$cNewVar   .= $aContent2[ $q ];
-					$cBlockTmp = str_replace(  '<w:t>'.$aContent2[ $q ].'</w:t>' , '<w:t></w:t>' , $cBlockTmp );				    	
+					$cBlockTmp  = str_replace(  '<w:t>'.$aContent2[ $q ].'</w:t>' , '<w:t></w:t>' , $cBlockTmp );				    	
 				}
 
 				$cNewVar = str_replace( '{' , '' , $cNewVar );				
@@ -179,17 +178,17 @@ function change03( $content_XML ,$aDataSearch , $aDataChange ) {
 							$cBlockTmp = str_replace( '{'.$aContentTmp[ $q ] , '' , $cBlockTmp );							
 						}
 						
-						$cBlockTmp   = str_replace( '{' , '' , $cBlockTmp );				
-						$cBlockTmp   = str_replace( '}' , '' , $cBlockTmp );				
-						$cBlockTmp   = str_replace( '<w:t></w:t>' , '' , $cBlockTmp );	
+						$cBlockTmp     = str_replace( '{' , '' , $cBlockTmp );				
+						$cBlockTmp     = str_replace( '}' , '' , $cBlockTmp );				
+						$cBlockTmp     = str_replace( '<w:t></w:t>' , '' , $cBlockTmp );	
 
-                        $aContentTmp = getContents( $cBlockTmp.'</w:t>' , '<w:t>' , '</w:t>' ); 
+                        $aContentTmp   = getContents( $cBlockTmp.'</w:t>' , '<w:t>' , '</w:t>' ); 
 						for( $z = 0 ; $z < count( $aContentTmp ) ; $z++ ) {
-                            $cBlockTmp   = str_replace( '<w:t>'.$aContentTmp[ $z ] , '<w:t>' , $cBlockTmp );							
+                            $cBlockTmp = str_replace( '<w:t>'.$aContentTmp[ $z ] , '<w:t>' , $cBlockTmp );							
 						}
 						
-						$content_XML = str_replace( $cBlock , $cBlockTmp . '<w:t>'.$cDataChange.'</w:t>'  , $content_XML ); //. '<w:t>'.$aDataChange[ $k ].'</w:t>'																											
-						$lChange     = true;				
+						$content_XML   = str_replace( $cBlock , $cBlockTmp . '<w:t>'.$cDataChange.'</w:t>'  , $content_XML ); //. '<w:t>'.$aDataChange[ $k ].'</w:t>'																											
+						$lChange       = true;				
                     }
 					
 				}									
@@ -231,9 +230,9 @@ function getContents($str, $startDelimiter, $endDelimiter) {
 function generatePrefix() {  
     $numbers     = (((date('Ymd') / 12) * 24) + mt_rand(800, 9999));
     $numbers    .= 123456789;
-    $characters  = $numbers . 'ABCDEFGHJKMNPQRSTXYZ';
+    $characters  = $numbers . 'abcdefghjmnoprstvxz';
     $ret         = substr(str_shuffle($characters), 0, 6);     
-    return $ret;       
+    return $ret;      
 }   
 
 /*
