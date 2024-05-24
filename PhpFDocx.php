@@ -36,15 +36,21 @@ function PhpFDocx( $doc , $aDataSearch , $aDataChange ) {
     }	
 
     preg_match_all("/\{(.*?)\}/", $content_XML, $matches);
-    $blocks = $matches[1];
-
-    foreach ($blocks as $block) {
-        $processedBlock = processBlock("{" . $block . "}");
-        $content_XML = str_replace("{" . $block . "}", $processedBlock, $content_XML);
-    }
+    $blocks = $matches[1];	
 
     for ($k = 0; $k < count($aDataSearch); $k++) {
-        $content_XML = str_replace('<w:t>{'.$aDataSearch[$k].'}</w:t>', '<w:t>'.$aDataChange[$k].'</w:t>', $content_XML);
+		
+        foreach ($blocks as $block) {
+
+            $processedBlock = processBlock("{" . $block . "}");
+			
+			if( strpos( $processedBlock , '<w:t>{'.$aDataSearch[ $k ] ) !== false ) { 			
+		        echo $processedBlock .'<br /><br />'.PHP_EOL;
+                $content_XML = str_replace("{" . $block . "}", $processedBlock, $content_XML);				
+                $content_XML = str_replace('<w:t>{'.$aDataSearch[$k].'}</w:t>', '<w:t>'.$aDataChange[$k].'</w:t>', $content_XML);			
+			}
+			
+        }
     }
 	
     $zip_val->addFromString($key_XML, $content_XML);
