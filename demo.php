@@ -18,10 +18,10 @@ include 'PhpFDocx.php';
 //$doc  = 'test5.docx';
 //$doc  = 'test6.docx';
 
-$doc = 'test7.docx';
+$doc = 'test1.docx';
 
 $aDataSearch = Array (  
-            'name'                    ,					
+                        'name'                    ,					
 			'NAME'                    ,
 			'address'                 ,
 			'ADDRESS'                 ,
@@ -35,16 +35,19 @@ $aDataSearch = Array (
 			'personalnumber'          ,
 			'personal-number'         ,						
 			'organizationnumber'      ,				   
+			'organization-number'     ,				
+			'whatsapp'                ,
 			'email'                   ,				   
 			'today'                   , 				
-            'documenttitle'           ,
+                        'documenttitle'           ,
 			'[test$variable]'         ,				
-			'test_complex!and@long-variable|for#tests'					
+			'test_complex!and@long-variable|for#tests',
+			'variable with spaces and simb@ls'
 		      );
 
 $aDataChange = Array (  
-            'Greyce, MacKensie X.'      ,
-            'GREYCE, MACKENSIE X.'      ,						
+                        'Greyce, MacKensie X.'      ,
+                        'GREYCE, MACKENSIE X.'      ,						
 			'Ap #288-1785-B5 Morbi Road', 
 			'AP #288-1785-B5 MORBI ROAD',
 			'Saint-Georges'             , 
@@ -55,13 +58,16 @@ $aDataChange = Array (
 			'AUSTRIA'                   ,						
 			'741488'                    ,
 			'16911214 2808'             ,						
-			'16911214 2808'             ,							
+			'16911214 2809'             ,							
 			'16911468 1404'             ,				   
+			'16911468 1405'             ,
+			'16911468 1406'             ,			
 			'placerat.orci@quam.edu'    ,
 			date('Y/m/d')               ,				
 			'Document Title Changed'    ,
 			'Teste Variable Changed'    ,
-			'test variable complex and long changed'					
+			'test variable complex and long changed',
+                        'changed variable with spaces and simb@ls changed'			
 		      );				
 						
 $result = PhpFDocx( $doc , $aDataSearch , $aDataChange );	
