@@ -43,13 +43,11 @@ function PhpFDocx( $doc , $aDataSearch , $aDataChange ) {
         foreach ($blocks as $block) {
 
             $processedBlock = processBlock("{" . $block . "}");
-			
-			if( strpos( $processedBlock , '<w:t>{'.$aDataSearch[ $k ] ) !== false ) { 			
-		        echo $processedBlock .'<br /><br />'.PHP_EOL;
+            if( strpos( $processedBlock , '<w:t>{'.$aDataSearch[ $k ] ) !== false ) { 					       
                 $content_XML = str_replace("{" . $block . "}", $processedBlock, $content_XML);				
                 $content_XML = str_replace('<w:t>{'.$aDataSearch[$k].'}</w:t>', '<w:t>'.$aDataChange[$k].'</w:t>', $content_XML);			
-			}
-			
+	    }	
+		
         }
     }
 	
