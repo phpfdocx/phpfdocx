@@ -18,7 +18,12 @@ include 'PhpFDocx.php';
 //$doc  = 'test5.docx';
 //$doc  = 'test6.docx';
 
-$doc = 'test1.docx';
+if(!isset( $_GET['f'] )) {
+   echo 'No file!';	
+   return 0;
+}
+	
+$doc = $_GET['f'];
 
 $aDataSearch = Array (  
                         'name'                    ,					
@@ -73,4 +78,5 @@ $aDataChange = Array (
 $result = PhpFDocx( $doc , $aDataSearch , $aDataChange );	
 
 echo '<a href="'.$result.'">View Generated Document = <b>'.$result.'</b></a><br /><br />';		
+echo '<a href="index.php">Go Back</a><br /><br />';	
 ?>				   
